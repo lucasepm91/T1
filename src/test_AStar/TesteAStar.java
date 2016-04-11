@@ -128,36 +128,65 @@ public class TesteAStar extends JPanel {
 
 		sBase.close();
 
+		/* Faz as combinações para passar por 11 bases
+		 independente do mapa */
 		Ataque.getInstance().piorCaso();
 		Ataque.getInstance().custoBases();                
 
-
+		long tempo1 = System.nanoTime();
+		long tempo2 = 0;
 		AStar aStar = new AStar(grade, origem, destino);
 		boolean pesquisaOk = aStar.iniciarPesquisa();         
 
+		int custoBases = 0;
+		
 		if (pesquisaOk) {
 			//Verifica se precisa redistribuir os aviões
 			Ataque.getInstance().verificaAtaques(aStar.getListaCaminho());
+			
+			tempo2 = System.nanoTime();
+			
+			for(int i = 0; i < Ataque.getInstance().getAvAtq().size();i++){        	
+				System.out.println("Avioes:");
+				for(int j = 0; j < Ataque.getInstance().getAvAtq().get(i).getComb().size();j++){
+					System.out.println(Ataque.getInstance().getAvAtq().get(i).getComb().get(j).getTipo()); 
+
+				}
+				System.out.print("Base: poder -> ");
+				System.out.print(Ataque.getInstance().getBasesAtq().get(i).getPoder());
+				System.out.print(" custo -> "); 
+				System.out.println(Ataque.getInstance().getBasesAtq().get(i).getCustoTerreno()); 
+				System.out.println("");
+				custoBases += Ataque.getInstance().getBasesAtq().get(i).getCustoTerreno();
+			}
+			if(custoBases > 0){
+				System.out.print("Custo total bases:");
+				System.out.println(custoBases);
+			}
 
 		} else {
 			System.out.println("Caminho nao foi encontrado.");
 			System.exit(0);
 		}        
-
-		for(int i = 0; i < Ataque.getInstance().getAvAtq().size();i++){        	
-			System.out.println("Avioes:");
-			for(int j = 0; j < Ataque.getInstance().getAvAtq().get(i).getComb().size();j++){
-				System.out.println(Ataque.getInstance().getAvAtq().get(i).getComb().get(j).getTipo()); 
-
+		
+		/* Comentar a linha que chama verificaAtaques() acima para
+		 mostrar o pior caso onde não há redistribuição
+		 */
+		if(Ataque.getInstance().getBasesAtq().size() == 0){
+			for(int i = 0; i < Ataque.getInstance().getBases().size();i++){	
+				System.out.print("Base: poder -> ");
+				System.out.print(Ataque.getInstance().getBases().get(i).getPoder());
+				System.out.print(" custo -> "); 
+				System.out.println(Ataque.getInstance().getBases().get(i).getCustoTerreno()); 
+				System.out.println("");
+				custoBases += Ataque.getInstance().getBases().get(i).getCustoTerreno();
 			}
-			System.out.print("Base: poder -> ");
-			System.out.print(Ataque.getInstance().getBasesAtq().get(i).getPoder());
-			System.out.print(" custo -> "); 
-			System.out.println(Ataque.getInstance().getBasesAtq().get(i).getCustoTerreno()); 
-			System.out.println("");
+			System.out.print("Custo total bases sem redistribuir:");
+			System.out.println(custoBases);
 		}
-
-
+		
+		System.out.println("Tempo de pesquisa: " + (tempo2 - tempo1) + "ns");
+		
 		// Interface gráfica
 
 		grid = grade; 
